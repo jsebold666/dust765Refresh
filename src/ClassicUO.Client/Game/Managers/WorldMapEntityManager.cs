@@ -47,10 +47,10 @@ namespace ClassicUO.Game.Managers
         {
             Serial = serial;
 
-            //var mob = World.Mobiles.Get(serial);
+            var mob = World.Mobiles.Get(serial);
 
-            //if (mob != null)
-            //    GetName();
+            if (mob != null)
+               GetName();
         }
 
         public bool IsGuild;
@@ -59,17 +59,17 @@ namespace ClassicUO.Game.Managers
         public readonly uint Serial;
         public int X, Y, HP, Map;
 
-        //public string GetName()
-        //{
-        //    Entity e = World.Get(Serial);
+        public string GetName()
+        {
+           Entity e = World.Get(Serial);
 
-        //    if (e != null && !e.IsDestroyed && !string.IsNullOrEmpty(e.Name) && Name != e.Name)
-        //    {
-        //        Name = e.Name;
-        //    }
+           if (e != null && !e.IsDestroyed && !string.IsNullOrEmpty(e.Name) && Name != e.Name)
+           {
+               Name = e.Name;
+           }
 
-        //    return string.IsNullOrEmpty(Name) ? "<out of range>" : Name;
-        //}
+           return string.IsNullOrEmpty(Name) ? "<out of rangeSSS>" : Name;
+        }
     }
 
     internal class WorldMapEntityManager
@@ -269,6 +269,28 @@ namespace ClassicUO.Game.Managers
                             }
                         }
                     }
+                } else
+                {
+                    foreach (Mobile mob in World.Mobiles.Values)
+                    {
+                        if (mob == World.Player)
+                        {
+                            continue;
+                        }
+
+                        Mobile mobs = World.Mobiles.Get(mob.Serial);
+                        if (mobs.NotorietyFlag == NotorietyFlag.Ally)
+                        {
+                            if (mobs == null || mobs.Distance > 2000000)
+                            {
+                                NetClient.Socket.Send_QueryGuildPosition();
+
+                                break;
+                            }
+                        }
+                       
+                    }
+
                 }
             }
         }

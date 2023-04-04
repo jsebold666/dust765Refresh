@@ -216,7 +216,7 @@ namespace ClassicUO.Game.UI.Gumps
             ResizeWindow(new Point(Width, Height));
 
             _flipMap = ProfileManager.CurrentProfile.WorldMapFlipMap;    
-            _showPartyMembers = ProfileManager.CurrentProfile.WorldMapShowParty;
+            //_showPartyMembers = ProfileManager.CurrentProfile.WorldMapShowParty;
 
             World.WMapManager.SetEnable(_showPartyMembers);
 
@@ -260,7 +260,7 @@ namespace ClassicUO.Game.UI.Gumps
             ProfileManager.CurrentProfile.WorldMapFlipMap = _flipMap;
             ProfileManager.CurrentProfile.WorldMapTopMost = TopMost;
             ProfileManager.CurrentProfile.WorldMapFreeView = FreeView;
-            ProfileManager.CurrentProfile.WorldMapShowParty = _showPartyMembers;
+            //ProfileManager.CurrentProfile.WorldMapShowParty = _showPartyMembers;
 
             ProfileManager.CurrentProfile.WorldMapZoomIndex = _zoomIndex;
 
@@ -2416,7 +2416,60 @@ namespace ClassicUO.Game.UI.Gumps
                     );
                 }
             }
+            _showPartyMembers = true;
+            if (_showPartyMembers)
+            {
+                foreach (Mobile mob in World.Mobiles.Values)
+                {
+                    if (mob == World.Player)
+                    {
+                        continue;
+                    }
 
+                    if (mob.NotorietyFlag == NotorietyFlag.Ally && mob.NotorietyFlag != NotorietyFlag.Invulnerable)
+                    {
+                        DrawMobile
+                        (
+                            batcher,
+                            mob,
+                            gX,
+                            gY,
+                            halfWidth,
+                            halfHeight,
+                            Zoom,
+                            Color.Red,
+                            true,
+                            true,
+                            _showGroupBar
+                        );
+                    }
+                    else
+                    {
+                       
+                      
+                        WMapEntity wme = World.WMapManager.GetEntity(mob.Serial);
+
+                        if (wme != null && wme.IsGuild || wme != null && mob.NotorietyFlag == NotorietyFlag.Ally)
+                        {
+                            DrawWMEntity
+                            (
+                                batcher,
+                                wme,
+                                gX,
+                                gY,
+                                halfWidth,
+                                halfHeight,
+                                Zoom
+                            );
+                        }
+                        
+                    }
+                }
+
+
+                
+            }
+            /*
             if (_showPartyMembers)
             {
                 for (int i = 0; i < 10; i++)
@@ -2458,7 +2511,7 @@ namespace ClassicUO.Game.UI.Gumps
                         {
                             WMapEntity wme = World.WMapManager.GetEntity(partyMember.Serial);
 
-                            if (wme != null && !wme.IsGuild)
+                            if (wme != null)
                             {
                                 DrawWMEntity
                                 (
@@ -2475,6 +2528,7 @@ namespace ClassicUO.Game.UI.Gumps
                     }
                 }
             }
+            */
 
             // ## BEGIN - END ## // TAZUO
             if (_showCorpse && World.WMapManager._corpse != null)
@@ -3223,9 +3277,11 @@ namespace ClassicUO.Game.UI.Gumps
             ushort uohue;
             Color color;
 
-            if (entity.IsGuild)
+            var mob = World.Mobiles.Get(entity.Serial);
+
+            if (entity.IsGuild || mob.NotorietyFlag == NotorietyFlag.Ally)
             {
-                uohue = 0x0044;
+                uohue = 0x044;
                 color = Color.LimeGreen;
             }
             else
